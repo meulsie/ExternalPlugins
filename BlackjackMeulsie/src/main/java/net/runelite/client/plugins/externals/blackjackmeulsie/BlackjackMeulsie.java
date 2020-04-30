@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetItem;
@@ -44,10 +43,9 @@ import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.externals.utils.ExtUtils;
+import net.runelite.client.plugins.externals.utils.ExtUtilsMeulsie;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.input.KeyManager;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.pf4j.Extension;
 
@@ -55,6 +53,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.awt.event.InputEvent.BUTTON1_DOWN_MASK;
 
 /**
  * Authors gazivodag longstreet
@@ -68,12 +73,13 @@ import java.util.List;
 	type = PluginType.SKILLING
 )
 @Slf4j
-public class BlackjackMeulsie extends Plugin
-{
+public class BlackjackMeulsie extends Plugin {
 	private static final int POLLNIVNEACH_REGION = 13358;
 
 	private static final String SUCCESS_BLACKJACK = "You smack the bandit over the head and render them unconscious.";
 	private static final String FAILED_BLACKJACK = "Your blow only glances off the bandit's head.";
+	private static final String COMBAT_BLACKJACK = "You can't do this during combat.";
+	private static final String SEEN_BLACKJACK = "Perhaps I shouldn't do this here, I think another Menaphite will see me.";
 
 	private static final String PICKPOCKET = "Pickpocket";
 	private static final String KNOCK_OUT = "Knock-out";
@@ -101,82 +107,60 @@ public class BlackjackMeulsie extends Plugin
 	private KeyManager keyManager;
 
 	@Inject
-	private ExtUtils extUtils;
+	private ExtUtilsMeulsie extUtils;
 
 	private long nextKnockOutTick = 0;
+	private int timeout = 0;
 	private static final int BLACKJACK_ID = 3550;
 	private List<NPC> npcList = new ArrayList<>();
 	private NPC closestNpc;
 	private Point point;
 	private Rectangle npcRect;
+	private Rectangle wineBounds;
+	private Point bounds;
 	private boolean run;
+	private boolean doDoubleClick;
+	private ExecutorService executorService;
 
 	@Provides
-	BlackjackMeulsieConfig getConfig(ConfigManager configManager)
-	{
+	BlackjackMeulsieConfig getConfig(ConfigManager configManager) {
 		return configManager.getConfig(BlackjackMeulsieConfig.class);
 	}
 
 	@Override
-	protected void startUp()
-	{
+	protected void startUp() {
 		keyManager.registerKeyListener(hotkeyListener);
 		menuManager.addPriorityEntry(KNOCKOUT_BANDIT);
 		menuManager.addPriorityEntry(KNOCKOUT_MENAPHITE);
+		executorService = Executors.newSingleThreadExecutor();
 	}
 
 	@Override
-	protected void shutDown()
-	{
+	protected void shutDown() {
 		menuManager.removePriorityEntry(PICKPOCKET_BANDIT);
 		menuManager.removePriorityEntry(PICKPOCKET_MENAPHITE);
 		menuManager.removePriorityEntry(KNOCKOUT_BANDIT);
 		menuManager.removePriorityEntry(KNOCKOUT_MENAPHITE);
 		keyManager.unregisterKeyListener(hotkeyListener);
-		//eventBus.unregister("poll");
+		executorService.shutdown();
 	}
 
 	private HotkeyListener hotkeyListener = new HotkeyListener(() -> config.toggle()) {
 		@Override
-		public void hotkeyPressed()
-		{
+		public void hotkeyPressed() {
 			if (run) {
-				/*point = client.getMouseCanvasPosition();
-				log.info(point.toString() + " captured as click point");*/
 				log.info("pausing...");
 				run = false;
 			} else {
-				//point = null;
 				log.info("resuming...");
 				run = true;
 			}
 		}
 	};
 
-/*	@Subscribe
-	private void onNpcSpawned(NpcSpawned npcSpawned)
-	{
-		final NPC npc = npcSpawned.getNpc();
-
-		if (npc.getId() == BLACKJACK_ID)
-		{
-			npcList.add(npc);
-		}
-	}
-
 	@Subscribe
-	private void onNpcDespawned(NpcDespawned npcDespawned)
-	{
-		final NPC npc = npcDespawned.getNpc();
-
-		npcList.remove(npc);
-	}*/
-
-	@Subscribe
-	private void onGameTick(GameTick event)
-	{
-		if(client.getGameState() != GameState.LOGGED_IN || client.getLocalPlayer() == null)
-		{
+	private void onGameTick(GameTick event) {
+		if (client.getGameState() != GameState.LOGGED_IN || client.getLocalPlayer() == null) {
 			log.info("not logged in.");
 			return;
 		} else {
@@ -186,43 +170,21 @@ public class BlackjackMeulsie extends Plugin
 				menuManager.addPriorityEntry(KNOCKOUT_BANDIT);
 				menuManager.addPriorityEntry(KNOCKOUT_MENAPHITE);
 			}
-			if (run) {
+			if (getWine().isEmpty()) {
+				log.info("We're out of wine");
+				run = false;
+			} else {
 				if (checkHitpoints()) {
-					if (config.flash()){
-						//setFlash(true);
-					}
-					try
-					{
-						Thread.sleep(extUtils.getRandomIntBetweenRange(208, 501));
-					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-
-					if(getWine().isEmpty()) {
-						log.info("We're out of wine");
-						run = false;
-					} else {
-						log.info("lets eat: " + getWine().get(0).getCanvasBounds().toString());
-						extUtils.moveClick(getWine().get(0).getCanvasBounds());
-					}
-					try
-					{
-						Thread.sleep(extUtils.getRandomIntBetweenRange(600, 1500));
-					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
+					drinkWine();
+					return;
 				}
-				closestNpc = extUtils.findNearestNpc(BLACKJACK_ID);
-				if (closestNpc != null) {
-					npcRect = closestNpc.getConvexHull().getBounds();
-					if (npcRect != null) {
-						log.info("npc rectangle: " + npcRect.toString());
-						extUtils.moveClick(closestNpc.getConvexHull().getBounds());
-					}
+			}
+			if (run) {
+				if (timeout > 0) { //currently not being used
+					log.info("wait tick: " + timeout);
+					timeout--;
+				} else {
+					handleBlackjack();
 				}
 			} else {
 				return;
@@ -231,27 +193,25 @@ public class BlackjackMeulsie extends Plugin
 	}
 
 	@Subscribe
-	private void onChatMessage(ChatMessage event)
-	{
+	private void onChatMessage(ChatMessage event) {
 		final String msg = event.getMessage();
 
-		if (event.getType() == ChatMessageType.SPAM && (msg.equals(SUCCESS_BLACKJACK) || (msg.equals(FAILED_BLACKJACK) && config.pickpocketOnAggro())))
-		{
+		if (event.getType() == ChatMessageType.SPAM && (msg.equals(SUCCESS_BLACKJACK) || (msg.equals(FAILED_BLACKJACK) && config.pickpocketOnAggro()))) {
 			menuManager.removePriorityEntry(KNOCKOUT_BANDIT);
 			menuManager.removePriorityEntry(KNOCKOUT_MENAPHITE);
 			menuManager.addPriorityEntry(PICKPOCKET_BANDIT);
 			menuManager.addPriorityEntry(PICKPOCKET_MENAPHITE);
 			final int ticks = config.random() ? RandomUtils.nextInt(3, 4) : 4;
 			nextKnockOutTick = client.getTickCount() + ticks;
+		} else if ((msg.equals(COMBAT_BLACKJACK)) || (msg.equals(SEEN_BLACKJACK))) {
+			log.info("we're in combat or we've been seen!");
+			run = false;
 		}
 	}
 
-	private static class BJComparableEntry extends AbstractComparableEntry
-	{
-		private BJComparableEntry(final String npc, final boolean pickpocket)
-		{
-			if (!BANDIT.equals(npc) && !MENAPHITE.equals(npc))
-			{
+	private static class BJComparableEntry extends AbstractComparableEntry {
+		private BJComparableEntry(final String npc, final boolean pickpocket) {
+			if (!BANDIT.equals(npc) && !MENAPHITE.equals(npc)) {
 				throw new IllegalArgumentException("Only bandits or menaphites are valid");
 			}
 
@@ -261,20 +221,100 @@ public class BlackjackMeulsie extends Plugin
 		}
 
 		@Override
-		public boolean matches(MenuEntry entry)
-		{
+		public boolean matches(MenuEntry entry) {
 			return entry.getOption().equalsIgnoreCase(this.getOption()) &&
-				Text.removeTags(entry.getTarget(), true).equalsIgnoreCase(this.getTarget());
+					Text.removeTags(entry.getTarget(), true).equalsIgnoreCase(this.getTarget());
 		}
 	}
 
-	private boolean checkHitpoints()
-	{
+	private void drinkWine() {
+		if (config.flash()) {
+			//setFlash(true);
+		}
+		if (getWine().isEmpty()) {
+			log.info("We're out of wine");
+			run = false;
+		} else {
+			log.info("lets drink: " + getWine().get(0).getCanvasBounds().toString());
+			//extUtils.moveClick(getWine().get(0).getCanvasBounds());
+			wineBounds = getWine().get(0).getCanvasBounds();
+			bounds = new Point((int) Math.round(wineBounds.getCenterX()) + (extUtils.getRandomIntBetweenRange(-15,15)),((int) Math.round(wineBounds.getCenterY()) + (extUtils.getRandomIntBetweenRange(-15,15))));
+			singleClick();
+			doDoubleClick = true;
+			timeout = 0; //this is not doing anything
+			/*if (npcRect != null) {
+				log.info("moving mouse");
+				extUtils.moveMouseEvent(npcRect); //Test to see if moving mouse after eating stops the walk click
+			}*/
+		}
+	}
+
+	private void handleBlackjack() {
+		log.info("handle blackjack");
+		//wait(randomDelay(50,100));
+		closestNpc = extUtils.findNearestNpc(BLACKJACK_ID);
+		if (closestNpc != null) {
+			npcRect = closestNpc.getConvexHull().getBounds();
+			bounds = new Point((int) Math.round(npcRect.getCenterX()) + (extUtils.getRandomIntBetweenRange(-2,2)),((int) Math.round(npcRect.getCenterY()) + (extUtils.getRandomIntBetweenRange(-2,2))));
+			if (bounds != null) {
+				if(!doDoubleClick) {
+					singleClick();
+				} else {
+					log.info("trying double click");
+					doubleClick();
+					doDoubleClick = false;
+				}
+			}
+		}
+	}
+
+	private boolean checkHitpoints() {
 		return client.getBoostedSkillLevel(Skill.HITPOINTS) <= config.hpThreshold();
 	}
 
-	private List<WidgetItem> getWine()
-	{
+	private List<WidgetItem> getWine() {
 		return extUtils.getItems(1993);
+	}
+
+	private void doubleClick()
+	{
+		delayFirstClick();
+		delaySecondClick();
+	}
+
+	private void singleClick()
+	{
+		delayFirstClick();
+	}
+
+	private void delayFirstClick()
+	{
+		final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+		service.schedule(this::simLeftClick, randomDelay(25, 35), TimeUnit.MILLISECONDS);
+		service.shutdown();
+	}
+
+	private void delaySecondClick()
+	{
+		final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+		service.schedule(this::simLeftClick, randomDelay(70, 80), TimeUnit.MILLISECONDS);
+		service.shutdown();
+	}
+
+	private void simLeftClick()
+	{
+		extUtils.moveClick(bounds);
+		return;
+	}
+
+	private static int randomDelay(int min, int max)
+	{
+		Random rand = new Random();
+		int n = rand.nextInt(max) + 1;
+		if (n < min)
+		{
+			n += min;
+		}
+		return n;
 	}
 }

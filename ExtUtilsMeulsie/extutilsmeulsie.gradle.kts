@@ -1,7 +1,6 @@
-import ProjectVersions.rlVersion
-
 /*
  * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2019 Ganom <https://github.com/Ganom>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,15 +24,14 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "5.11.0"
 
-project.extra["PluginName"] = "BlackjackMeulsie"
-project.extra["PluginDescription"] = "Allows for one-click blackjacking, both knocking out and pickpocketing"
+project.extra["PluginName"] = "ExtUtilsMeulsie"
+project.extra["PluginDescription"] = "Utils required for plugins to function."
 
 dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
-    compileOnly(project(":ExtUtilsMeulsie"))
 
     compileOnly("com.github.open-osrs.runelite:runelite-api:-SNAPSHOT")
     compileOnly("com.github.open-osrs.runelite:runelite-client:-SNAPSHOT")
@@ -44,7 +42,6 @@ dependencies {
     compileOnly(Libraries.okhttp3)
     compileOnly(Libraries.apacheCommonsText)
     compileOnly(Libraries.rxjava)
-
 }
 
 tasks {
@@ -54,7 +51,6 @@ tasks {
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to nameToId("extutilsmeulsie"),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))

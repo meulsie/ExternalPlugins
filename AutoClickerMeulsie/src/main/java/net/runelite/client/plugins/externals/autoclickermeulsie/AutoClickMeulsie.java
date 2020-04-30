@@ -23,16 +23,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.Point;
 import net.runelite.api.Skill;
 import net.runelite.api.NPC;
-import net.runelite.api.Player;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.HitsplatApplied;
-import net.runelite.api.events.InteractingChanged;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.events.SpotAnimationChanged;
-import net.runelite.api.events.WidgetLoaded;
-import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
 import net.runelite.client.game.ItemManager;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -43,7 +33,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.externals.utils.ExtUtils;
-import net.runelite.client.plugins.externals.utils.Tab;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import org.pf4j.Extension;
@@ -194,19 +183,6 @@ public class AutoClickMeulsie extends Plugin
 		extUtils.click(item.getCanvasBounds());
 	}
 
-	public void clickNpc(NPC npc) {
-		extUtils.click(npc.getConvexHull().getBounds());
-	}
-
-	public void getNpc() {
-		//Flexoflyfish has some good examples if needed
-	}
-
-	public void sortNpcByDistance(List<NPC> npcs) {
-		final LocalPoint cameraPoint = new LocalPoint(client.getCameraX(), client.getCameraY());
-		npcs.sort(Comparator.comparing(npc -> -1 * npc.getLocalLocation().distanceTo(cameraPoint)));
-	}
-
 	private List<WidgetItem> getItems(int... itemIds)
 	{
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
@@ -350,5 +326,16 @@ public class AutoClickMeulsie extends Plugin
 		}
 		final Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
 		return inventoryWidget.getWidgetItems().size() == 28;
+	}
+
+	private static int randomDelay(int min, int max)
+	{
+		Random rand = new Random();
+		int n = rand.nextInt(max) + 1;
+		if (n < min)
+		{
+			n += min;
+		}
+		return n;
 	}
 }

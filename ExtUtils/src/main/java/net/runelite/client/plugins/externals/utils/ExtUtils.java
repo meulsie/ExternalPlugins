@@ -16,17 +16,12 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.DecorativeObject;
-import net.runelite.api.GameObject;
-import net.runelite.api.GroundObject;
-import net.runelite.api.Point;
-import net.runelite.api.TileObject;
-import net.runelite.api.WallObject;
+import net.runelite.api.*;
 import net.runelite.api.queries.DecorativeObjectQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.GroundObjectQuery;
 import net.runelite.api.queries.InventoryWidgetItemQuery;
+import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -82,6 +77,22 @@ public class ExtUtils extends Plugin
 			.idEquals(ids)
 			.result(client)
 			.nearestTo(client.getLocalPlayer());
+	}
+
+	@Nullable
+	public NPC findNearestNpc(int... ids)
+	{
+		assert client.isClientThread();
+
+		if (client.getLocalPlayer() == null)
+		{
+			return null;
+		}
+
+		return new NPCQuery()
+				.idEquals(ids)
+				.result(client)
+				.nearestTo(client.getLocalPlayer());
 	}
 
 	@Nullable
@@ -145,6 +156,21 @@ public class ExtUtils extends Plugin
 			.idEquals(ids)
 			.result(client)
 			.list;
+	}
+
+	public List<NPC> getNPCs(int... ids)
+	{
+		assert client.isClientThread();
+
+		if (client.getLocalPlayer() == null)
+		{
+			return new ArrayList<>();
+		}
+
+		return new NPCQuery()
+				.idEquals(ids)
+				.result(client)
+				.list;
 	}
 
 	public List<WallObject> getWallObjects(int... ids)
@@ -379,6 +405,40 @@ public class ExtUtils extends Plugin
 			mouseEvent(500, point);
 			return;
 		}
+		mouseEvent(501, p);
+		mouseEvent(502, p);
+		mouseEvent(500, p);
+	}
+
+	public void moveClick(Rectangle rectangle)
+	{
+		assert !client.isClientThread();
+		Point point = getClickPoint(rectangle);
+		moveClick(point);
+	}
+
+	public void moveClick(Point p)
+	{
+		assert !client.isClientThread();
+
+		if (client.isStretchedEnabled())
+		{
+			final Dimension stretched = client.getStretchedDimensions();
+			final Dimension real = client.getRealDimensions();
+			final double width = (stretched.width / real.getWidth());
+			final double height = (stretched.height / real.getHeight());
+			final Point point = new Point((int) (p.getX() * width), (int) (p.getY() * height));
+			mouseEvent(504, point);
+			mouseEvent(505, point);
+			mouseEvent(503, point);
+			mouseEvent(501, point);
+			mouseEvent(502, point);
+			mouseEvent(500, point);
+			return;
+		}
+		mouseEvent(504, p);
+		mouseEvent(505, p);
+		mouseEvent(503, p);
 		mouseEvent(501, p);
 		mouseEvent(502, p);
 		mouseEvent(500, p);

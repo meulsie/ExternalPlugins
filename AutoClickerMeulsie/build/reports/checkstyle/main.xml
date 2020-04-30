@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.25">
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\AutoClickerMeulsie\src\main\java\net\runelite\client\plugins\externals\autoclickermeulsie\AutoClickMeulsie.java">
+<error line="25" column="8" severity="error" message="Unused import - net.runelite.api.Player." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="27" column="8" severity="error" message="Unused import - net.runelite.api.events.GameStateChanged." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="28" column="8" severity="error" message="Unused import - net.runelite.api.events.GameTick." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="29" column="8" severity="error" message="Unused import - net.runelite.api.events.HitsplatApplied." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="30" column="8" severity="error" message="Unused import - net.runelite.api.events.InteractingChanged." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="31" column="8" severity="error" message="Unused import - net.runelite.api.events.ItemContainerChanged." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="32" column="8" severity="error" message="Unused import - net.runelite.api.events.SpotAnimationChanged." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="33" column="8" severity="error" message="Unused import - net.runelite.api.events.WidgetLoaded." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="34" column="15" severity="error" message="Unused import - net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="45" column="8" severity="error" message="Unused import - net.runelite.client.plugins.externals.utils.Tab." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="121" column="67" severity="error" message="&apos;{&apos; at column 60 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="126" column="39" severity="error" message="&apos;{&apos; at column 25 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="130" column="71" severity="error" message="&apos;{&apos; at column 57 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="131" column="58" severity="error" message="&apos;{&apos; at column 37 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="140" column="64" severity="error" message="&apos;{&apos; at column 57 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="141" column="37" severity="error" message="&apos;{&apos; at column 23 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="145" column="46" severity="error" message="&apos;{&apos; at column 32 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="150" column="57" severity="error" message="&apos;{&apos; at column 50 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="151" column="72" severity="error" message="&apos;{&apos; at column 58 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="155" column="35" severity="error" message="&apos;{&apos; at column 21 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="157" column="82" severity="error" message="&apos;{&apos; at column 61 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="164" column="61" severity="error" message="&apos;{&apos; at column 40 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="166" column="25" severity="error" message="&apos;}&apos; at column 4 should be alone on a line." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="166" column="32" severity="error" message="&apos;{&apos; at column 11 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="172" column="54" severity="error" message="&apos;{&apos; at column 47 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+<error line="177" column="39" severity="error" message="&apos;{&apos; at column 32 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\AutoClickerMeulsie\src\main\java\net\runelite\client\plugins\externals\autoclickermeulsie\AutoClickMeulsieConfig.java">
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\AutoClickerMeulsie\src\main\java\net\runelite\client\plugins\externals\autoclickermeulsie\AutoClickMeulsieOverlay.java">
+</file>
+</checkstyle>

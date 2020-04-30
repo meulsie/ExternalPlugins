@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.25">
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\BlackjackMeulsie\src\main\java\net\runelite\client\plugins\externals\blackjackmeulsie\BlackjackMeulsie.java">
+<error line="33" column="8" severity="error" message="Unused import - net.runelite.api.GameState." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="36" column="8" severity="error" message="Unused import - net.runelite.api.events.GameStateChanged." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="50" column="8" severity="error" message="Unused import - org.apache.commons.lang3.ArrayUtils." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="125" column="91" severity="error" message="&apos;{&apos; at column 84 should be on a new line." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\BlackjackMeulsie\src\main\java\net\runelite\client\plugins\externals\blackjackmeulsie\BlackjackMeulsieConfig.java">
+</file>
+</checkstyle>

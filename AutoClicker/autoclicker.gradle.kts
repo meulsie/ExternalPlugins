@@ -26,7 +26,7 @@
 
 version = "5.11.0"
 
-project.extra["PluginName"] = "AutoClicker"
+project.extra["PluginName"] = "AutoClickMeulsie"
 project.extra["PluginDescription"] = "What more is there to say?"
 
 dependencies {

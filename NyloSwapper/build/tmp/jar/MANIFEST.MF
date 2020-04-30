@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Plugin-Version: 5.10.0
+Plugin-Id: nyloswapper-plugin
+Plugin-Provider: Ganom
+Plugin-Dependencies: extutils-plugin
+Plugin-Description: Nylo Swapper.
+Plugin-License: GNU General Public License v3.0
+

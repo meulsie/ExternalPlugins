@@ -11,6 +11,8 @@ include(":OneClick")
 include(":ExtUtils")
 include(":AutoClicker")
 include(":Anonymizer")
+include(":AutoClickerMeulsie")
+include(":BlackjackMeulsie")
 
 for (project in rootProject.children) {
     project.apply {

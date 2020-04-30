@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Plugin-Version: 5.11.0
+Plugin-Id: autoclickmeulsie-plugin
+Plugin-Provider: Ganom
+Plugin-Dependencies: extutils-plugin
+Plugin-Description: What more is there to say?
+Plugin-License: GNU General Public License v3.0
+

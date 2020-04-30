@@ -6,6 +6,9 @@
 package net.runelite.client.plugins.externals.autoclicker;
 
 import com.google.inject.Provides;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,14 +21,28 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Point;
 import net.runelite.api.Skill;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
+import net.runelite.api.Point;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.HitsplatApplied;
+import net.runelite.api.events.InteractingChanged;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.SpotAnimationChanged;
+import net.runelite.api.events.WidgetLoaded;
+import static net.runelite.api.widgets.WidgetID.LEVEL_UP_GROUP_ID;
+import net.runelite.client.game.ItemManager;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.externals.utils.ExtUtils;
+import net.runelite.client.plugins.externals.utils.Tab;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import org.pf4j.Extension;
@@ -61,6 +78,7 @@ public class AutoClick extends Plugin
 	private Point point;
 	private Random random;
 	private boolean run;
+	private ItemManager itemManager;
 
 	@Getter(AccessLevel.PACKAGE)
 	@Setter(AccessLevel.PACKAGE)
@@ -89,6 +107,99 @@ public class AutoClick extends Plugin
 		executorService.shutdown();
 		random = null;
 	}
+
+	private List<WidgetItem> getFish() //Inventory fish items
+	{
+		return getItems(11328, 11330, 11332, 15491, 15492, 15493);
+	}
+
+	private List<WidgetItem> getDrop()
+	{
+		return getItems(11328, 11330, 11332, 15491, 15492, 15493, 13648, 13649, 13650, 13651, 15484, 15485, 15486, 15487, 23129, 23130);
+	}
+
+	public List<WidgetItem> getInventoryItems(int... itemIds) {
+		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+		ArrayList<Integer> itemIDs = new ArrayList<>();
+		List<WidgetItem> list = new ArrayList<>();
+
+		for (int i : itemIds) {
+			itemIDs.add(i);
+		}
+
+		for (WidgetItem i : inventoryWidget.getWidgetItems()) {
+			if (itemIDs.contains(i.getId())) {
+				list.add(i);
+			}
+
+		}
+
+		return list;
+	}
+
+	public void clickInventoryItems(List<WidgetItem> list) {
+		if (list.isEmpty()) {
+			return;
+		}
+
+		for (WidgetItem item : list) {
+			clickInventoryItem(item);
+		}
+	}
+
+	public void clickInventoryItem(WidgetItem item) {
+		if (client.getWidget(WidgetInfo.INVENTORY).isHidden()) {
+			//this.keyPress(tabUtils.getTabHotkey(Tab.INVENTORY)); not sure how to do this at the moment
+			log.debug("Inventory is not open");
+		}
+		if (item != null) {
+			String name = Integer.toString(item.getId());
+			if (itemManager.getItemDefinition(item.getId()) != null) {
+				name = itemManager.getItemDefinition((item.getId())).getName();
+
+			}
+
+			log.debug("Grabbing getCanvasBounds of " + name);
+
+			if (item.getCanvasBounds() != null) {
+				clickWidgetItem(item);
+			} else {
+				log.debug("Could not find getCanvasBounds of " + name);
+			}
+		}
+	}
+
+	public void clickWidgetItem(WidgetItem item) {
+		//clickPoint(getWidgetItemClickPoint(item)); flexo runelite-bot driven
+		extUtils.click(item.getCanvasBounds());
+	}
+
+	public void clickNpc(NPC npc) {
+		extUtils.click(npc.getConvexHull().getBounds());
+	}
+
+	private List<WidgetItem> getItems(int... itemIds)
+	{
+		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+		ArrayList<Integer> itemIDs = new ArrayList<>();
+		for (int i : itemIds)
+		{
+			itemIDs.add(i);
+		}
+
+		List<WidgetItem> listToReturn = new ArrayList<>();
+
+		for (WidgetItem item : inventoryWidget.getWidgetItems())
+		{
+			if (itemIDs.contains(item.getId()))
+			{
+				listToReturn.add(item);
+			}
+		}
+
+		return listToReturn;
+	}
+
 
 	private HotkeyListener hotkeyListener = new HotkeyListener(() -> config.toggle())
 	{

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Plugin-Version: 5.10.0
+Plugin-Id: olmswapper-plugin
+Plugin-Provider: Ganom
+Plugin-Dependencies: extutils-plugin
+Plugin-Description: Automatically swaps prayers for CoX.
+Plugin-License: GNU General Public License v3.0
+

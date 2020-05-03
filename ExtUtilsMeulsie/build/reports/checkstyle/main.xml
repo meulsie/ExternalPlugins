@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.25">
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\ExtUtilsMeulsie\src\main\java\net\runelite\client\plugins\externals\utils\ExtUtilsMeulsie.java">
+<error line="19" severity="error" message="Multiline imports are disallowed if they are not static" source="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineJavaCheck"/>
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\ExtUtilsMeulsie\src\main\java\net\runelite\client\plugins\externals\utils\PrayerMap.java">
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\ExtUtilsMeulsie\src\main\java\net\runelite\client\plugins\externals\utils\Spells.java">
+</file>
+<file name="C:\Users\joshm\Documents\JavaProjects\ExternalPlugins\ExtUtilsMeulsie\src\main\java\net\runelite\client\plugins\externals\utils\Tab.java">
+</file>
+</checkstyle>

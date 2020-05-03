@@ -94,4 +94,16 @@ public interface BlackjackMeulsieConfig extends Config
 	{
 		return false;
 	}
+
+	@ConfigItem(
+			keyName = "foodToEat",
+			name = "ID of food to eat",
+			description = "The food the plugin will use to eat",
+			position = 5,
+			unhide = "autoDisable"
+	)
+	default int foodToEat()
+	{
+		return 1993;
+	} //default returns wine
 }

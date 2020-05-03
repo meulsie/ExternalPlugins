@@ -35,6 +35,7 @@ import net.runelite.api.Point;
 import net.runelite.api.events.*;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -51,7 +52,6 @@ import org.pf4j.Extension;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -109,6 +109,9 @@ public class BlackjackMeulsie extends Plugin {
 	@Inject
 	private ExtUtilsMeulsie extUtils;
 
+	@Inject
+	private Notifier notifier;
+
 	private long nextKnockOutTick = 0;
 	private int timeout = 0;
 	private static final int BLACKJACK_ID = 3550;
@@ -116,7 +119,7 @@ public class BlackjackMeulsie extends Plugin {
 	private NPC closestNpc;
 	private Point point;
 	private Rectangle npcRect;
-	private Rectangle wineBounds;
+	private Rectangle foodBounds;
 	private Point bounds;
 	private boolean run;
 	private boolean doDoubleClick;
@@ -170,7 +173,7 @@ public class BlackjackMeulsie extends Plugin {
 				menuManager.addPriorityEntry(KNOCKOUT_BANDIT);
 				menuManager.addPriorityEntry(KNOCKOUT_MENAPHITE);
 			}
-			if (getWine().isEmpty()) {
+			if (getFood().isEmpty()) {
 				log.info("We're out of wine");
 				run = false;
 			} else {
@@ -206,6 +209,7 @@ public class BlackjackMeulsie extends Plugin {
 		} else if ((msg.equals(COMBAT_BLACKJACK)) || (msg.equals(SEEN_BLACKJACK))) {
 			log.info("we're in combat or we've been seen!");
 			run = false;
+			notifier.notify("we're in combat or we've been seen!", TrayIcon.MessageType.WARNING);
 		}
 	}
 
@@ -231,14 +235,14 @@ public class BlackjackMeulsie extends Plugin {
 		if (config.flash()) {
 			//setFlash(true);
 		}
-		if (getWine().isEmpty()) {
+		if (getFood().isEmpty()) {
 			log.info("We're out of wine");
 			run = false;
 		} else {
-			log.info("lets drink: " + getWine().get(0).getCanvasBounds().toString());
-			//extUtils.moveClick(getWine().get(0).getCanvasBounds());
-			wineBounds = getWine().get(0).getCanvasBounds();
-			bounds = new Point((int) Math.round(wineBounds.getCenterX()) + (extUtils.getRandomIntBetweenRange(-15,15)),((int) Math.round(wineBounds.getCenterY()) + (extUtils.getRandomIntBetweenRange(-15,15))));
+			log.info("lets eat: " + getFood().get(0).getCanvasBounds().toString());
+			//extUtils.moveClick(getFood().get(0).getCanvasBounds());
+			foodBounds = getFood().get(0).getCanvasBounds();
+			bounds = new Point((int) Math.round(foodBounds.getCenterX()) + (extUtils.getRandomIntBetweenRange(-15,15)),((int) Math.round(foodBounds.getCenterY()) + (extUtils.getRandomIntBetweenRange(-15,15))));
 			singleClick();
 			doDoubleClick = true;
 			timeout = 0; //this is not doing anything
@@ -272,8 +276,8 @@ public class BlackjackMeulsie extends Plugin {
 		return client.getBoostedSkillLevel(Skill.HITPOINTS) <= config.hpThreshold();
 	}
 
-	private List<WidgetItem> getWine() {
-		return extUtils.getItems(1993);
+	private List<WidgetItem> getFood() {
+		return extUtils.getItems(config.foodToEat());
 	}
 
 	private void doubleClick()
@@ -290,7 +294,7 @@ public class BlackjackMeulsie extends Plugin {
 	private void delayFirstClick()
 	{
 		final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-		service.schedule(this::simLeftClick, randomDelay(25, 35), TimeUnit.MILLISECONDS);
+		service.schedule(this::simLeftClick, randomDelay(50, 100), TimeUnit.MILLISECONDS);
 		service.shutdown();
 	}
 
